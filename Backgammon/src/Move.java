@@ -1,50 +1,48 @@
-
 /* A class describing a move in the board
  * Every produced child corresponds to a move
  * and we need to keep the moves as well as the states.
  */
 public class Move
 {
-    private int row;
-    private int col;
+    private int player;
+    private int starting_position;
+    private int target_position;
     private int value;
 
     Move()
     {
-        this.row = -1;
-        this.col = -1;
+        this.starting_position = 0;
+        this.target_position = 0;
+        this.player = -1;
         this.value = 0;
     }
 
-    Move(int row, int col)
+    Move(int player, int starting_position, int target_position)
     {
-        this.row = row;
-        this.col = col;
-        this.value = -1;
+        this.player = player;
+        this.starting_position = starting_position;
+        this.target_position = -1;
     }
 
-    Move(int value)
+    Move(int target_position)
     {
-        this.row = -1;
-        this.col = -1;
-        this.value = value;
+        this.starting_position = -1;
+        this.target_position = target_position;
     }
 
-    Move(int row, int col, int value)
+    int getStart()
     {
-        this.row = row;
-        this.col = col;
-        this.value = value;
+        return this.starting_position;
     }
 
-    int getRow()
+    int getTarget()
     {
-        return this.row;
+        return this.target_position;
     }
 
-    int getCol()
+    int getPlayer()
     {
-        return this.col;
+        return this.player;
     }
 
     int getValue()
@@ -52,14 +50,14 @@ public class Move
         return this.value;
     }
 
-    void setRow(int row)
+    void setStart(int starting_position)
     {
-        this.row = row;
+        this.starting_position = starting_position;
     }
 
-    void setCol(int col)
+    void setTarget(int target_position)
     {
-        this.col = col;
+        this.target_position = target_position;
     }
 
     void setValue(int value)

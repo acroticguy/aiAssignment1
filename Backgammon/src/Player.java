@@ -14,7 +14,7 @@ public class Player
 
     Move MiniMax(Board board)
     {
-        if(playerLetter == Board.X)
+        if(playerLetter == Board.W)
         {
             //If the X plays then it wants to maximize the heuristics value
             return max(new Board(board), 0);
@@ -36,10 +36,10 @@ public class Player
          */
         if(board.isTerminal() || (depth == this.maxDepth))
         {
-            return new Move(board.getLastMove().getRow(), board.getLastMove().getCol(), board.evaluate());
+            return new Move(board.getLastMove().getStart(), board.getLastMove().getTarget(), board.evaluate());
         }
         //The children-moves of the state are calculated
-        ArrayList<Board> children = board.getChildren(Board.X);
+        ArrayList<Board> children = board.getChildren(Board.W, 1);
         Move maxMove = new Move(Integer.MIN_VALUE); // put max node initially to smallest value.
         for(Board child: children)
         {
@@ -53,15 +53,13 @@ public class Player
                 {
                     if(r.nextInt(2) == 0)
                     {
-                        maxMove.setRow(child.getLastMove().getRow());
-                        maxMove.setCol(child.getLastMove().getCol());
+                        maxMove.setStart(child.getLastMove().getStart());
                         maxMove.setValue(move.getValue());
                     }
                 }
                 else
                 {
-                    maxMove.setRow(child.getLastMove().getRow());
-                    maxMove.setCol(child.getLastMove().getCol());
+                    maxMove.setStart(child.getLastMove().getStart());
                     maxMove.setValue(move.getValue());
                 }
             }
@@ -75,9 +73,9 @@ public class Player
         Random r = new Random();
         if(board.isTerminal() || (depth == this.maxDepth))
         {
-            return new Move(board.getLastMove().getRow(), board.getLastMove().getCol(), board.evaluate());
+            return new Move(board.getLastMove().getStart(), board.getLastMove().getTarget(), board.evaluate());
         }
-        ArrayList<Board> children = board.getChildren(Board.O);
+        ArrayList<Board> children = board.getChildren(Board.B, 1);
         Move minMove = new Move(Integer.MAX_VALUE);
         for(Board child: children)
         {
@@ -88,15 +86,13 @@ public class Player
                 {
                     if(r.nextInt(2) == 0)
                     {
-                        minMove.setRow(child.getLastMove().getRow());
-                        minMove.setCol(child.getLastMove().getCol());
+                        minMove.setStart(child.getLastMove().getStart());
                         minMove.setValue(move.getValue());
                     }
                 }
                 else
                 {
-                    minMove.setRow(child.getLastMove().getRow());
-                    minMove.setCol(child.getLastMove().getCol());
+                    minMove.setStart(child.getLastMove().getStart());
                     minMove.setValue(move.getValue());
                 }
             }
