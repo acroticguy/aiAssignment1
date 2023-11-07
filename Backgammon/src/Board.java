@@ -8,10 +8,10 @@ public class Board
     public static final int B = -1;
     public static final int EMPTY = 0;
 
-    public static final int GRAVE_W = 0;
-    public static final int GRAVE_B = 27;
-    public static final int ESCAPE_W = 1;
-    public static final int ESCAPE_B = 26;
+    public static final int GRAVE_W = 1;
+    public static final int GRAVE_B = 26;
+    public static final int ESCAPE_W = 0;
+    public static final int ESCAPE_B = 27;
 
     private int[] gameBoard; // The board has length 28, Spaces 0 and 27 indicate the graveyard, and spaces 1 and 26 indicate the "escaped" pieces. 2-25 are the playable tiles.
 
@@ -51,40 +51,61 @@ public class Board
         }
     }
 
-    //Make a move; it moves a piece by the dice's number
-    void makeMove(int starting_index, int dice, int player)
+    //Make a move; it moves a piece by the dice's number (since Black goes left, the dice movements need to be backwards, hence dice * player)
+    void makeMove(int starting_index, int dice)
     {
-        int target_index = starting_index + (dice * player);
+        int target_index = starting_index + (dice * this.lastPlayer);
 
-        if (targetIsEnemy(player, target_index)) {
-            this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * player; //Remove the piece from the original position
-            this.gameBoard[target_index] = player;
-
-            //Add opponent's piece to the graveyard
-            if (player == 1) {
-                this.gameBoard[GRAVE_B] -= 1;
-            } else {
-                this.gameBoard[GRAVE_W] += 1;
-            }
-
+        if (target_index > 25) {
+            this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * this.lastPlayer; //Remove the piece from the original position
+            this.gameBoard[ESCAPE_W] = (Math.abs(this.gameBoard[ESCAPE_W]) + 1) * this.lastPlayer; //Add the piece to the target index
+        } else if (target_index < 2) {
+            this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * this.lastPlayer; //Remove the piece from the original position
+            this.gameBoard[ESCAPE_B] = (Math.abs(this.gameBoard[ESCAPE_B]) + 1) * this.lastPlayer; //Add the piece to the target index
         } else {
-            this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * player; //Remove the piece from the original position
-            this.gameBoard[target_index] = (Math.abs(this.gameBoard[target_index]) + 1) * player; //Add the piece to the target index
+
+            //Target is within bounds
+
+            if (targetIsEnemy(target_index)) {
+                this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * this.lastPlayer; //Remove the piece from the original position
+                this.gameBoard[target_index] = this.lastPlayer; //Replace the existing piece with our own
+
+                //Add opponent's piece to the graveyard
+                if (this.lastPlayer == W) {
+                    this.gameBoard[GRAVE_B] -= 1;
+                } else {
+                    this.gameBoard[GRAVE_W] += 1;
+                }
+            } else {
+                this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * this.lastPlayer; //Remove the piece from the original position
+                this.gameBoard[target_index] = (Math.abs(this.gameBoard[target_index]) + 1) * this.lastPlayer; //Add the piece to the target index
+            }
         }
-        this.lastMove = new Move(player, starting_index, target_index);
-        this.lastPlayer = player;
+
+        
+        this.lastMove = new Move(this.lastPlayer, starting_index, target_index);
     }
 
-    boolean targetIsEnemy(int player, int target_index) {return (player * this.gameBoard[target_index] == -1);}
+    boolean targetIsEnemy(int target_index) {return (this.lastPlayer * this.gameBoard[target_index] == -1);}
 
     //Checks whether a move is valid
-    boolean isValidMove(int start, int target, int player)
+    boolean isValidMove(int start, int target)
     {
-        if (target <= 25 && target >= 2 && this.gameBoard[start] * player > 0) //Target Tile is within bounds
+        if (this.gameBoard[start] * this.lastPlayer > 0) //We are picking up a friendly piece
         {
-            if(this.gameBoard[target] == EMPTY || this.gameBoard[target] + player == 0 || this.gameBoard[target] * player > 0) return true; //Target Tile is either empty, has 1 opponent or has player's pieces
+            if (target > 25 || target < 2) return true;
+            if(this.gameBoard[target] == EMPTY || this.gameBoard[target] + this.lastPlayer == 0 || this.gameBoard[target] * this.lastPlayer > 0) return true; //Target Tile is either empty, has 1 opponent or has player's pieces
         }
         
+        return false;
+    }
+
+    boolean isGraveyard() {
+        if (this.lastPlayer == W && this.gameBoard[1] > 0) {
+            return true;
+        } else if (this.lastPlayer == B && this.gameBoard[26] < 0) {
+            return true;
+        }
         return false;
     }
 
@@ -96,10 +117,10 @@ public class Board
         ArrayList<Board> children = new ArrayList<>();
         for(int tile = 0; tile < this.gameBoard.length; tile++)
         {
-            if(this.isValidMove(tile, tile + dice * player, player)) //is valid move, and the starting tile has player's pieces
+            if(this.isValidMove(tile, tile + dice * player)) //is valid move
             {
                 Board child = new Board(this);
-                child.makeMove(tile, 1, player);
+                child.makeMove(tile, 1);
                 children.add(child);
             }
         }
@@ -133,15 +154,7 @@ public class Board
         return true;
     }
 
-    void print()
-    {
-        for (int i: this.gameBoard){
-            System.out.println(i);
-        }
-        System.out.println("WORK IN PROGRESS");
-    }
-
-    void printB(int dice_1, int dice_2){
+    void print(int dice_1, int dice_2){
         System.out.println("******************************");
         String panw_orofos = "";
         String katw_orofos = "";
@@ -168,8 +181,8 @@ public class Board
         System.out.print("              " + dice_1 + " : " + dice_2);
         System.out.print("\n\n\n");
         System.out.println(katw_orofos);
-        System.out.println("WHITE GRAVE: " + Math.abs(this.gameBoard[0]) + " || " + "BLACK GRAVE: " + Math.abs(this.gameBoard[27]));
-        System.out.println("WHITE ESCAPED: " + Math.abs(this.gameBoard[1]) + " || " + "BLACK ESCAPED: " + Math.abs(this.gameBoard[26]));
+        System.out.println("WHITE GRAVE: " + Math.abs(this.gameBoard[GRAVE_W]) + " || " + "BLACK GRAVE: " + Math.abs(this.gameBoard[GRAVE_B]));
+        System.out.println("WHITE ESCAPED: " + Math.abs(this.gameBoard[ESCAPE_W]) + " || " + "BLACK ESCAPED: " + Math.abs(this.gameBoard[ESCAPE_B]));
         System.out.println("******************************");
     }
 
