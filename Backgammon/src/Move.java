@@ -6,28 +6,29 @@ public class Move
 {
     private int player;
     private int starting_position;
-    private int target_position;
-    private int value;
+    private int dice;
+    private double score;
 
     Move()
     {
         this.starting_position = 0;
-        this.target_position = 0;
+        this.dice = 0;
         this.player = -1;
-        this.value = 0;
+        this.score = 0;
     }
 
-    Move(int player, int starting_position, int target_position)
+    Move(int player, int starting_position, int dice, double score)
     {
         this.player = player;
         this.starting_position = starting_position;
-        this.target_position = -1;
+        this.dice = dice;
+        this.score = score;
     }
 
-    Move(int target_position)
+    Move(int value)
     {
         this.starting_position = -1;
-        this.target_position = target_position;
+        this.score = value;
     }
 
     int getStart()
@@ -35,9 +36,8 @@ public class Move
         return this.starting_position;
     }
 
-    int getTarget()
-    {
-        return this.target_position;
+    int getDice() {
+        return this.dice;
     }
 
     int getPlayer()
@@ -45,23 +45,21 @@ public class Move
         return this.player;
     }
 
-    int getValue()
+    int getTarget()
     {
-        return this.value;
+        return starting_position + (this.dice * this.player);
     }
 
-    void setStart(int starting_position)
+    double getValue()
     {
+        return this.score;
+    }
+
+    void setStart(int starting_position) {
         this.starting_position = starting_position;
     }
-
-    void setTarget(int target_position)
+    void setValue(double value)
     {
-        this.target_position = target_position;
-    }
-
-    void setValue(int value)
-    {
-        this.value = value;
+        this.score = value;
     }
 }
