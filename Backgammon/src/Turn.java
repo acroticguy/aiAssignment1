@@ -33,8 +33,8 @@ public class Turn {
 
     String printTurn() {
         String str = "";
-        for (int i = 0; i < this.moveset.size(); i++) {
-            str += "(" + this.moveset.get(i).getStart() + "->" + this.moveset.get(i).getTarget() + ")";
+        for (Move move: this.moveset) {
+            str += "(" + move.getStart() + "->" + move.getTarget() + ")";
         }
         return str;
     }

@@ -62,7 +62,7 @@ public class Board
     //Make a move; it moves a piece by the dice's number (since Black goes left, the dice movements need to be backwards, hence dice * player)
     void makeMove(int starting_index, int dice)
     {
-        int target_index = starting_index + (dice * this.lastPlayer);
+        int target_index = starting_index + (dice * this.lastPlayer); 
 
         if (target_index > 25) {
             this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * this.lastPlayer; //Remove the piece from the original position
@@ -80,7 +80,7 @@ public class Board
 
                 //Add opponent's piece to the graveyard
                 if (this.lastPlayer == W) {
-                    this.gameBoard[GRAVE_B] -= 1;
+                    this.gameBoard[GRAVE_B] -= 1; // Black is negative, this adds a black piece.
                 } else {
                     this.gameBoard[GRAVE_W] += 1;
                 }
@@ -111,7 +111,7 @@ public class Board
 
                 //Add opponent's piece to the graveyard
                 if (this.lastPlayer == W) {
-                    this.gameBoard[GRAVE_B] -= 1;
+                    this.gameBoard[GRAVE_B] -= 1; // Black is negative, this adds a black piece.
                 } else {
                     this.gameBoard[GRAVE_W] += 1;
                 }
@@ -135,11 +135,14 @@ public class Board
         this.lastTurn = turn;
     }
 
-    boolean targetIsEnemy(int target_index) {return (this.lastPlayer * this.gameBoard[target_index] == -1);} //targetIsEnemy is only executed in blocks where isValidMove is TRUE
+    boolean targetIsEnemy(int target_index) {return (this.lastPlayer * this.gameBoard[target_index] == -1);} //targetIsEnemy is only executed in blocks where isValidMove is TRUE, so there's no need for extra checks.
 
     //Checks whether a move is valid
     boolean isValidMove(int start, int target)
     {
+        if (start > 26 || start < 1) { // Starting position out of playable bounds
+            return false;
+        }
         if (this.gameBoard[start] * this.lastPlayer > 0 && !isTerminal()) //We are picking up a friendly piece
         {
             if (target > 25) { // If White is trying to escape, if we find at least 1 piece outside of the home area, return false
@@ -157,16 +160,16 @@ public class Board
     }
 
     boolean isGraveyard() {
-        if (this.lastPlayer == W && this.gameBoard[GRAVE_W] > 0) {
+        if (this.lastPlayer == W && this.gameBoard[GRAVE_W] > 0) { // If we are white and have pieces in Graveyard
             return true;
-        } else if (this.lastPlayer == B && this.gameBoard[GRAVE_B] < 0) {
+        } else if (this.lastPlayer == B && this.gameBoard[GRAVE_B] < 0) { // If we are black and have pieces in Graveyard
             return true;
         }
         return false;
     }
 
     /* Generates the children of the state
-     * Any square in the board that is empty results to a child
+     * Each unique combination of valid dice moves results in another child.
      */
     ArrayList<Board> getChildren(int player, Dice dice)
     {
