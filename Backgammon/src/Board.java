@@ -121,7 +121,7 @@ public class Board
             }
         }
         
-        this.lastMove = new Move(move.getPlayer(), move.getStart(), move.getDice(), move.getValue());
+        this.lastMove = new Move(move.getPlayer(), move.getStart(), move.getDice(), move.getScore());
         this.lastTurn.addMove(this.lastMove);
     }
 
@@ -511,7 +511,7 @@ public class Board
     void setLastMove(Move lastMove)
     {
         this.lastMove.setStart(lastMove.getStart());
-        this.lastMove.setValue(lastMove.getValue());
+        this.lastMove.setValue(lastMove.getScore());
     }
 
     void setLastPlayer(int lastPlayer)

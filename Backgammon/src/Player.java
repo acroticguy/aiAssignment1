@@ -48,10 +48,10 @@ public class Player
 
         for (Board child: children) {
                 //The child-move with the greatest value is selected and returned by max
-                if(child.getLastTurn().getValue() >= maxTurn.getValue())
+                if(child.getLastTurn().getScore() >= maxTurn.getScore())
                 {
                     //If the heuristic has the save value then we randomly choose one of the two moves
-                    if((child.getLastTurn().getValue()) == maxTurn.getValue())
+                    if((child.getLastTurn().getScore()) == maxTurn.getScore())
                     {
                         if(r.nextInt(2) == 0)
                         {
@@ -85,10 +85,10 @@ public class Player
 
         for (Board child: children) {
                 //The child-move with the greatest value is selected and returned by max
-                if(child.getLastTurn().getValue() <= minTurn.getValue())
+                if(child.getLastTurn().getScore() <= minTurn.getScore())
                 {
                     //If the heuristic has the save value then we randomly choose one of the two moves
-                    if((child.getLastTurn().getValue()) == minTurn.getValue())
+                    if((child.getLastTurn().getScore()) == minTurn.getScore())
                     {
                         if(r.nextInt(2) == 0)
                         {

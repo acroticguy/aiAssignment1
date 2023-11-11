@@ -39,7 +39,7 @@ public class Turn {
         return str;
     }
 
-    double getValue() {
-        return this.moveset.get(this.moveset.size() - 1).getValue();
+    double getScore() {
+        return this.moveset.get(this.moveset.size() - 1).getScore();
     }
 }

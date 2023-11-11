@@ -50,7 +50,7 @@ public class Move
         return starting_position + (this.dice * this.player);
     }
 
-    double getValue()
+    double getScore()
     {
         return this.score;
     }
