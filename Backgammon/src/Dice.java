@@ -26,4 +26,13 @@ public class Dice {
     int[] getDice() {
         return this.dice;
     }
+
+    String printDice() {
+
+        return "(" + dice[0] + " and " + dice[1] + ")";
+    }
+
+    double prob() {
+        return ((dice[0] == dice[1]) ? 1.0/36.0 : 1.0/18.0);
+    }
 }

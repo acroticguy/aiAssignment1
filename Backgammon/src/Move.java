@@ -25,10 +25,17 @@ public class Move
         this.score = score;
     }
 
-    Move(int value)
+    Move(double score)
     {
         this.starting_position = -1;
-        this.score = value;
+        this.score = score;
+    }
+
+    Move(Move move) {
+        this.starting_position = move.getStart();
+        this.dice = move.getDice();
+        this.player = move.getPlayer();
+        this.score = move.getScore();
     }
 
     int getStart()
@@ -58,8 +65,8 @@ public class Move
     void setStart(int starting_position) {
         this.starting_position = starting_position;
     }
-    void setValue(double value)
+    void setScore(double score)
     {
-        this.score = value;
+        this.score = score;
     }
 }

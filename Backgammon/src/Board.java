@@ -19,7 +19,7 @@ public class Board
     /* Variable containing who played last; whose turn resulted in this board
      * Even a new Board has lastLetterPlayed value; it denotes which player will play first
      */
-    private int lastPlayer;
+    private int currPlayer;
 
     //Immediate move that lead to this board
     private Move lastMove;
@@ -31,7 +31,7 @@ public class Board
     {
         this.lastMove = new Move();
         this.lastTurn = new Turn();
-        this.lastPlayer = B;
+        this.currPlayer = W;
         this.gameBoard = new int[28];
         this.dice = dice;
 
@@ -50,7 +50,7 @@ public class Board
     {
         this.lastMove = board.lastMove;
         this.lastTurn = new Turn(board.lastTurn); // DEEP COPY IS REQUIRED
-        this.lastPlayer = board.lastPlayer;
+        this.currPlayer = board.currPlayer;
         this.gameBoard = new int[28];
         this.dice = board.dice;
         for(int i = 0; i < this.gameBoard.length; i++)
@@ -62,62 +62,62 @@ public class Board
     //Make a move; it moves a piece by the dice's number (since Black goes left, the dice movements need to be backwards, hence dice * player)
     void makeMove(int starting_index, int dice)
     {
-        int target_index = starting_index + (dice * this.lastPlayer); 
+        int target_index = starting_index + (dice * this.currPlayer); 
 
         if (target_index > 25) {
-            this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * this.lastPlayer; //Remove the piece from the original position
-            this.gameBoard[ESCAPE_W] = (Math.abs(this.gameBoard[ESCAPE_W]) + 1) * this.lastPlayer; //Add the piece to the target index
+            this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * this.currPlayer; //Remove the piece from the original position
+            this.gameBoard[ESCAPE_W] = (Math.abs(this.gameBoard[ESCAPE_W]) + 1) * this.currPlayer; //Add the piece to the target index
         } else if (target_index < 2) {
-            this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * this.lastPlayer; //Remove the piece from the original position
-            this.gameBoard[ESCAPE_B] = (Math.abs(this.gameBoard[ESCAPE_B]) + 1) * this.lastPlayer; //Add the piece to the target index
+            this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * this.currPlayer; //Remove the piece from the original position
+            this.gameBoard[ESCAPE_B] = (Math.abs(this.gameBoard[ESCAPE_B]) + 1) * this.currPlayer; //Add the piece to the target index
         } else {
 
             //Target is within bounds
 
             if (targetIsEnemy(target_index)) { 
-                this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * this.lastPlayer; //Remove the piece from the original position
-                this.gameBoard[target_index] = this.lastPlayer; //Replace the existing piece with our own
+                this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * this.currPlayer; //Remove the piece from the original position
+                this.gameBoard[target_index] = this.currPlayer; //Replace the existing piece with our own
 
                 //Add opponent's piece to the graveyard
-                if (this.lastPlayer == W) {
+                if (this.currPlayer == W) {
                     this.gameBoard[GRAVE_B] -= 1; // Black is negative, this adds a black piece.
                 } else {
                     this.gameBoard[GRAVE_W] += 1;
                 }
             } else {
-                this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * this.lastPlayer; //Remove the piece from the original position
-                this.gameBoard[target_index] = (Math.abs(this.gameBoard[target_index]) + 1) * this.lastPlayer; //Add the piece to the target index
+                this.gameBoard[starting_index] = (Math.abs(this.gameBoard[starting_index]) - 1) * this.currPlayer; //Remove the piece from the original position
+                this.gameBoard[target_index] = (Math.abs(this.gameBoard[target_index]) + 1) * this.currPlayer; //Add the piece to the target index
             }
         }
         
-        this.lastMove = new Move(this.lastPlayer, starting_index, dice, this.evaluate());
+        this.lastMove = new Move(this.currPlayer, starting_index, dice, this.evaluate());
         this.lastTurn.addMove(this.lastMove);
     }
 
     void makeMove(Move move) {
         if (move.getTarget() > 25) {
-            this.gameBoard[move.getStart()] = (Math.abs(this.gameBoard[move.getStart()]) - 1) * this.lastPlayer; //Remove the piece from the original position
-            this.gameBoard[ESCAPE_W] = (Math.abs(this.gameBoard[ESCAPE_W]) + 1) * this.lastPlayer; //Add the piece to the target index
+            this.gameBoard[move.getStart()] = (Math.abs(this.gameBoard[move.getStart()]) - 1) * this.currPlayer; //Remove the piece from the original position
+            this.gameBoard[ESCAPE_W] = (Math.abs(this.gameBoard[ESCAPE_W]) + 1) * this.currPlayer; //Add the piece to the target index
         } else if (move.getTarget() < 2) {
-            this.gameBoard[move.getStart()] = (Math.abs(this.gameBoard[move.getStart()]) - 1) * this.lastPlayer; //Remove the piece from the original position
-            this.gameBoard[ESCAPE_B] = (Math.abs(this.gameBoard[ESCAPE_B]) + 1) * this.lastPlayer; //Add the piece to the target index
+            this.gameBoard[move.getStart()] = (Math.abs(this.gameBoard[move.getStart()]) - 1) * this.currPlayer; //Remove the piece from the original position
+            this.gameBoard[ESCAPE_B] = (Math.abs(this.gameBoard[ESCAPE_B]) + 1) * this.currPlayer; //Add the piece to the target index
         } else {
 
             //Target is within bounds
 
             if (targetIsEnemy(move.getTarget())) { 
-                this.gameBoard[move.getStart()] = (Math.abs(this.gameBoard[move.getStart()]) - 1) * this.lastPlayer; //Remove the piece from the original position
-                this.gameBoard[move.getTarget()] = this.lastPlayer; //Replace the existing piece with our own
+                this.gameBoard[move.getStart()] = (Math.abs(this.gameBoard[move.getStart()]) - 1) * this.currPlayer; //Remove the piece from the original position
+                this.gameBoard[move.getTarget()] = this.currPlayer; //Replace the existing piece with our own
 
                 //Add opponent's piece to the graveyard
-                if (this.lastPlayer == W) {
+                if (this.currPlayer == W) {
                     this.gameBoard[GRAVE_B] -= 1; // Black is negative, this adds a black piece.
                 } else {
                     this.gameBoard[GRAVE_W] += 1;
                 }
             } else {
-                this.gameBoard[move.getStart()] = (Math.abs(this.gameBoard[move.getStart()]) - 1) * this.lastPlayer; //Remove the piece from the original position
-                this.gameBoard[move.getTarget()] = (Math.abs(this.gameBoard[move.getTarget()]) + 1) * this.lastPlayer; //Add the piece to the target index
+                this.gameBoard[move.getStart()] = (Math.abs(this.gameBoard[move.getStart()]) - 1) * this.currPlayer; //Remove the piece from the original position
+                this.gameBoard[move.getTarget()] = (Math.abs(this.gameBoard[move.getTarget()]) + 1) * this.currPlayer; //Add the piece to the target index
             }
         }
         
@@ -128,14 +128,17 @@ public class Board
     void makeTurn(Turn turn) {
         this.getLastTurn().clearTurn();
         for (int i = 0; i < turn.getTurn().size(); i++) {
-            makeMove(turn.getTurn().get(i));
+            if (turn.getTurn().get(i).getStart() == -1) { // All moves from -1 to -1 are invalid. Empty board arrays give -1 -> -1 moves.
+                System.out.println("NO AVAILABLE MOVES. TURN SKIPPED!");
+                continue;
+            }
+            this.makeMove(turn.getTurn().get(i));
         }
-
-        this.lastPlayer *= -1; // Change player after turn
+        this.currPlayer *= -1;
         this.lastTurn = turn;
     }
 
-    boolean targetIsEnemy(int target_index) {return (this.lastPlayer * this.gameBoard[target_index] == -1);} //targetIsEnemy is only executed in blocks where isValidMove is TRUE, so there's no need for extra checks.
+    boolean targetIsEnemy(int target_index) {return (this.currPlayer * this.gameBoard[target_index] == -1);} //targetIsEnemy is only executed in blocks where isValidMove is TRUE, so there's no need for extra checks.
 
     //Checks whether a move is valid
     boolean isValidMove(int start, int target)
@@ -143,26 +146,28 @@ public class Board
         if (start > 26 || start < 1) { // Starting position out of playable bounds
             return false;
         }
-        if (this.gameBoard[start] * this.lastPlayer > 0 && !isTerminal()) //We are picking up a friendly piece
+        if (this.gameBoard[start] * this.currPlayer > 0 && !this.isTerminal()) //We are picking up a friendly piece
         {
             if (target > 25) { // If White is trying to escape, if we find at least 1 piece outside of the home area, return false
                 for (int i = 2; i < 20; i++) {
                     if (this.gameBoard[i] > 0) return false;
                 }
+                return true;
             } else if (target < 2) { // If Black is trying to escape, if we find at least 1 piece outside of the home area, return false
                 for (int i = 25; i > 8; i--) {
                     if (this.gameBoard[i] < 0) return false;
                 }
+                return true;
             }
-            if(this.gameBoard[target] == EMPTY || this.gameBoard[target] + this.lastPlayer == 0 || this.gameBoard[target] * this.lastPlayer > 0) return true; //Target Tile is either empty, has 1 opponent or has player's pieces
+            if(this.gameBoard[target] == EMPTY || this.gameBoard[target] + this.currPlayer == 0 || this.gameBoard[target] * this.currPlayer > 0) return true; //Target Tile is either empty, has 1 opponent or has player's pieces
         }
         return false;
     }
 
     boolean isGraveyard() {
-        if (this.lastPlayer == W && this.gameBoard[GRAVE_W] > 0) { // If we are white and have pieces in Graveyard
+        if (this.currPlayer == W && this.gameBoard[GRAVE_W] > 0) { // If we are white and have pieces in Graveyard
             return true;
-        } else if (this.lastPlayer == B && this.gameBoard[GRAVE_B] < 0) { // If we are black and have pieces in Graveyard
+        } else if (this.currPlayer == B && this.gameBoard[GRAVE_B] < 0) { // If we are black and have pieces in Graveyard
             return true;
         }
         return false;
@@ -171,41 +176,49 @@ public class Board
     /* Generates the children of the state
      * Each unique combination of valid dice moves results in another child.
      */
-    ArrayList<Board> getChildren(int player, Dice dice)
+    ArrayList<Board> getChildren(int player)
     {
         int target_position;
         int id = 0;
+        int validMoveCounter = 0;
+        Turn temp_turn = new Turn();
 
         this.lastTurn.clearTurn(); //Empty the list, so that the potential moves build on lastTurn
-        if (dice.isDouble()) {
-            target_position = dice.getDice()[0] * player;
+        if (this.dice.isDouble()) {
+            target_position = this.dice.getDice()[0] * player;
             ArrayList<Board> temp = new ArrayList<>();
             temp.add(this);
-            return doubleGetChildren(temp, target_position, 0);
+            temp = doubleGetChildren(temp, target_position, 0, validMoveCounter);
+            for (Board baby: temp) {
+                temp_turn = baby.getLastTurn();
+                baby = new Board(this);
+                baby.makeTurn(temp_turn);
+            }
+            return temp;
         } else {
             ArrayList<Board> parents = new ArrayList<>();
             ArrayList<Board> children = new ArrayList<>();
             for (int i = 0; i < 2; i++) {
-                target_position = dice.getDice()[i] * player;
+                target_position = this.dice.getDice()[i] * player;
                 if (this.isGraveyard() && player == W) {
                     if(this.isValidMove(GRAVE_W, GRAVE_W + target_position)) //Only valid moves are added
                     {
                         Board child = new Board(this);
-                        System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
+                        // FOR DEBUG                               System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
                         id++;
-                        child.makeMove(GRAVE_W, dice.getDice()[i]);
+                        child.makeMove(GRAVE_W, this.dice.getDice()[i]);
                         parents.add(child);
-                        System.out.println("Move From: White Grave -> " + target_position + " Successfully Added to possible moves");
+                        // FOR DEBUG                               System.out.println("Move From: White Grave -> " + target_position + " Successfully Added to possible moves");
                     }
                 } else if (this.isGraveyard() && player == B){
                     if(this.isValidMove(GRAVE_B, GRAVE_B + target_position)) //Only valid moves are added
                     {
                         Board child = new Board(this);
-                        System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
+                        // FOR DEBUG                               System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
                         id++;
-                        child.makeMove(GRAVE_B, dice.getDice()[i]);
+                        child.makeMove(GRAVE_B, this.dice.getDice()[i]);
                         parents.add(child);
-                        System.out.println("Move From: Black Grave -> " + target_position + " Successfully Added to possible moves");
+                        // FOR DEBUG                               System.out.println("Move From: Black Grave -> " + target_position + " Successfully Added to possible moves");
                     }
                 } else {
                     for(int tile = 2; tile < this.gameBoard.length - 2; tile++)
@@ -213,11 +226,11 @@ public class Board
                         if(this.isValidMove(tile, tile + target_position)) //Only valid moves are added
                         {
                             Board child = new Board(this);
-                            System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
+                            // FOR DEBUG                               System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
                             id++;
-                            child.makeMove(tile, dice.getDice()[i]);
+                            child.makeMove(tile, this.dice.getDice()[i]);
                             parents.add(child);
-                            System.out.println("Move From: " + (tile - 1) + " -> " + (tile - 1 + target_position) + " Successfully Added to possible moves");
+                            // FOR DEBUG                               System.out.println("Move From: " + (tile - 1) + " -> " + (tile - 1 + target_position) + " Successfully Added to possible moves");
                         }
                     }
                 }
@@ -225,103 +238,123 @@ public class Board
             }
 
             for (Board child_i: parents) {
-                if (child_i.getLastMove().getDice() == dice.getDice()[0]) { // If our last move was using dice 1, now calculate next moves with dice 2
-                    target_position = dice.getDice()[1] * player;
+                if (child_i.getLastMove().getDice() == this.dice.getDice()[0]) { // If our last move was using dice 1, now calculate next moves with dice 2
+                    target_position = this.dice.getDice()[1] * player;
                     if (child_i.isGraveyard() && player == W) {
                         if(child_i.isValidMove(GRAVE_W, GRAVE_W + target_position)) //Only valid moves are added
                         {
+                            validMoveCounter++;
                             Board baby = new Board(child_i);
-                            System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
+                            // FOR DEBUG                               System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
                             id++;
-                            baby.makeMove(GRAVE_W, dice.getDice()[1]);
+                            baby.makeMove(GRAVE_W, this.dice.getDice()[1]);
                             if (children.contains(baby)) { // IF GAMESTATE IS ALREADY PROVIDED WITH ONE WAY OR ANOTHER, JUST KEEP A SINGLE COPY 
                                 continue;
                             }
                             children.add(baby);
-                            System.out.println("Move From: White Grave -> " + target_position + " Successfully Added to possible moves");
+                            // FOR DEBUG                               System.out.println("Move From: White Grave -> " + target_position + " Successfully Added to possible moves");
                         }
                     } else if (child_i.isGraveyard() && player == B){
                         if(child_i.isValidMove(GRAVE_B, GRAVE_B + target_position)) //Only valid moves are added
                         {
+                            validMoveCounter++;
                             Board baby = new Board(child_i);
-                            System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
+                            // FOR DEBUG                               System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
                             id++;
-                            baby.makeMove(GRAVE_B, dice.getDice()[1]);
+                            baby.makeMove(GRAVE_B, this.dice.getDice()[1]);
                             if (children.contains(baby)) { // IF GAMESTATE IS ALREADY PROVIDED WITH ONE WAY OR ANOTHER, JUST KEEP A SINGLE COPY
                                 continue;
                             }
                             children.add(baby);
-                            System.out.println("Move From: Black Grave -> " + target_position + " Successfully Added to possible moves");
+                            // FOR DEBUG                               System.out.println("Move From: Black Grave -> " + target_position + " Successfully Added to possible moves");
                         }
                     } else {
                         for(int tile = 2; tile < child_i.gameBoard.length - 2; tile++)
                         {
                             if(child_i.isValidMove(tile, tile + target_position)) //Only valid moves are added
                             {
+                                validMoveCounter++;
                                 Board baby = new Board(child_i);
-                                System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
+                                // FOR DEBUG                               System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
                                 id++;
-                                baby.makeMove(tile, dice.getDice()[1]);
+                                baby.makeMove(tile, this.dice.getDice()[1]);
                                 if (children.contains(baby)) { // IF GAMESTATE IS ALREADY PROVIDED WITH ONE WAY OR ANOTHER, JUST KEEP A SINGLE COPY
                                     continue;
                                 }
                                 children.add(baby);
-                                System.out.println("Move From: " + (tile - 1) + " -> " + (tile - 1 + target_position) + " Successfully Added to possible moves");
+                                // FOR DEBUG                               System.out.println("Move From: " + (tile - 1) + " -> " + (tile - 1 + target_position) + " Successfully Added to possible moves");
                             }
                         }
                     }
                 } else { // If our last move was using dice 2, now calculate next moves with dice 1
-                    target_position = dice.getDice()[0] * player;
+                    target_position = this.dice.getDice()[0] * player;
                     if (child_i.isGraveyard() && player == W) {
                         if(child_i.isValidMove(GRAVE_W, GRAVE_W + target_position)) //Only valid moves are added
                         {
+                            validMoveCounter++;
                             Board baby = new Board(child_i);
-                            System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
+                            // FOR DEBUG                               System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
                             id++;
-                            baby.makeMove(GRAVE_W, dice.getDice()[0]);
+                            baby.makeMove(GRAVE_W, this.dice.getDice()[0]);
                             if (children.contains(baby)) { // IF GAMESTATE IS ALREADY PROVIDED WITH ONE WAY OR ANOTHER, JUST KEEP A SINGLE COPY
-                                System.out.println("CHILDREN CONTAINS BABY, #" + id + " removed");
+                                // FOR DEBUG                               System.out.println("CHILDREN CONTAINS BABY, #" + id + " removed");
                                 continue;
                             }
                             children.add(baby);
-                            System.out.println("Move From: White Grave -> " + target_position + " Successfully Added to possible moves");
+                            // FOR DEBUG                               System.out.println("Move From: White Grave -> " + target_position + " Successfully Added to possible moves");
                         }
                     } else if (child_i.isGraveyard() && player == B){
                         if(child_i.isValidMove(GRAVE_B, GRAVE_B + target_position)) //Only valid moves are added
                         {
+                            validMoveCounter++;
                             Board baby = new Board(child_i);
-                            System.out.println("NEW BOARD CREATED, BOARD ID: " + id + "\n");
-                            baby.print(dice);
+                            // FOR DEBUG                               System.out.println("NEW BOARD CREATED, BOARD ID: " + id + "\n");
+                            baby.print(this.dice);
                             id++;
-                            baby.makeMove(GRAVE_B, dice.getDice()[0]);
+                            baby.makeMove(GRAVE_B, this.dice.getDice()[0]);
                             if (children.contains(baby)) { // IF GAMESTATE IS ALREADY PROVIDED WITH ONE WAY OR ANOTHER, JUST KEEP A SINGLE COPY
-                                System.out.println("CHILDREN CONTAINS BABY, #" + id + " removed");
+                               // FOR DEBUG                                System.out.println("CHILDREN CONTAINS BABY, #" + id + " removed");
                                 continue;
                             }
                             children.add(baby);
-                            System.out.println("Move From: Black Grave -> " + target_position + " Successfully Added to possible moves");
+                            // FOR DEBUG                               System.out.println("Move From: Black Grave -> " + target_position + " Successfully Added to possible moves");
                         }
                     } else {
                         for(int tile = 2; tile < child_i.gameBoard.length - 2; tile++)
                         {
                             if(child_i.isValidMove(tile, tile + target_position)) //Only valid moves are added
                             {
+                                validMoveCounter++;
                                 Board baby = new Board(child_i);
-                                System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
+                                // FOR DEBUG                               System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
                                 id++;
-                                baby.makeMove(tile, dice.getDice()[0]);
+                                baby.makeMove(tile, this.dice.getDice()[0]);
                                 if (children.contains(baby)) { // IF GAMESTATE IS ALREADY PROVIDED WITH ONE WAY OR ANOTHER, JUST KEEP A SINGLE COPY
-                                    System.out.println("CHILDREN CONTAINS BABY, #" + id + " removed");
+                                    // FOR DEBUG                               System.out.println("CHILDREN CONTAINS BABY, #" + id + " removed");
                                     continue;
                                 }
                                 children.add(baby);
-                                System.out.println("Move From: " + (tile - 1) + " -> " + (tile - 1 + target_position) + " Successfully Added to possible moves");
+                                // FOR DEBUG                               System.out.println("Move From: " + (tile - 1) + " -> " + (tile - 1 + target_position) + " Successfully Added to possible moves");
                             }
                         }
                     }
                 }
             }
-            System.out.println("Calculated " + children.size() + " moves.");
+            if (validMoveCounter == 0) {
+                for (Board parent: parents) {
+                    temp_turn = parent.getLastTurn();
+                    parent = new Board(this);
+                    parent.makeTurn(temp_turn);
+                }
+                return parents;
+            }
+            System.out.println("Calculated " + children.size() + " moves. Dice: " + this.dice.printDice());
+            for (Board child: children) {
+                    temp_turn = child.getLastTurn();
+                    child = new Board(this);
+                    child.makeTurn(temp_turn);
+            }
+
             return children;
         }
         
@@ -376,10 +409,10 @@ public class Board
      */
     boolean isTerminal()
     {
-        if (this.gameBoard[ESCAPE_W] != 15 && this.gameBoard[ESCAPE_B] != 15) {
-            return false;
+        if (this.gameBoard[ESCAPE_W] >= 15 || this.gameBoard[ESCAPE_B] <= -15) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     void print(Dice dice) {
@@ -424,63 +457,66 @@ public class Board
      * 
      */
 
-    ArrayList<Board> doubleGetChildren(ArrayList<Board> boards, int target_position, int depth) {
+    ArrayList<Board> doubleGetChildren(ArrayList<Board> boards, int target_position, int depth, int validMoveCounter) {
         ArrayList<Board> children = new ArrayList<>();
         int id = 0;
-        if (depth == 4) {
-            System.out.println("Calculated " + boards.size() + " moves.");
+        if (depth == 4 || (depth > 0 && depth < 4 && validMoveCounter == 0) ) {
+            // FOR DEBUG                               System.out.println("Calculated " + boards.size() + " moves. (Double)");
             return boards;
         }
         for (Board child_i: boards) {
             if (child_i.isGraveyard() && child_i.getLastPlayer() == W) {
                 if(child_i.isValidMove(GRAVE_W, GRAVE_W + target_position)) //Only valid moves are added
                 {
+                    validMoveCounter++;
                     Board baby = new Board(child_i);
                     baby.makeMove(GRAVE_W, dice.getDice()[0]);
-                    System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
+                    // FOR DEBUG                               System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
                     id++;
                     if (children.contains(baby)) { // IF GAMESTATE IS ALREADY PROVIDED WITH ONE WAY OR ANOTHER, JUST KEEP A SINGLE COPY
-                        System.out.println("CHILDREN CONTAINS BABY, #" + id + " removed");
+                        // FOR DEBUG                               System.out.println("CHILDREN CONTAINS BABY, #" + id + " removed");
                         continue;
                     }
                     children.add(baby);
-                    System.out.println("Move From: White Grave -> " + target_position + " Successfully Added to possible moves");
+                    // FOR DEBUG                               System.out.println("Move From: White Grave -> " + target_position + " Successfully Added to possible moves");
                 }
             } else if (child_i.isGraveyard() && child_i.getLastPlayer() == B){
                 if(child_i.isValidMove(GRAVE_B, GRAVE_B + target_position)) //Only valid moves are added
                 {
+                    validMoveCounter++;
                     Board baby = new Board(child_i);
                     baby.makeMove(GRAVE_B, dice.getDice()[0]);
-                    System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
+                    // FOR DEBUG                               System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
                     id++;
                     if (children.contains(baby)) { // IF GAMESTATE IS ALREADY PROVIDED WITH ONE WAY OR ANOTHER, JUST KEEP A SINGLE COPY
-                        System.out.println("CHILDREN CONTAINS BABY, #" + id + " removed");
+                        // FOR DEBUG                               System.out.println("CHILDREN CONTAINS BABY, #" + id + " removed");
                         continue;
                     }
                     children.add(baby);
-                    System.out.println("Move From: Black Grave -> " + target_position + " Successfully Added to possible moves");
+                    // FOR DEBUG                               System.out.println("Move From: Black Grave -> " + target_position + " Successfully Added to possible moves");
                 }
             } else {
                 for(int tile = 2; tile < child_i.gameBoard.length - 2; tile++)
                 {
                     if(child_i.isValidMove(tile, tile + target_position)) //Only valid moves are added
                     {
+                        validMoveCounter++;
                         Board baby = new Board(child_i);
                         baby.makeMove(tile, dice.getDice()[0]);
-                        System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
+                        // FOR DEBUG                               System.out.println("NEW BOARD CREATED, BOARD ID: " + id);
                         id++;
                         if (children.contains(baby)) { // IF GAMESTATE IS ALREADY PROVIDED WITH ONE WAY OR ANOTHER, JUST KEEP A SINGLE COPY
-                            System.out.println("CHILDREN CONTAINS BABY, #" + id + " removed");
+                            // FOR DEBUG                               System.out.println("CHILDREN CONTAINS BABY, #" + id + " removed");
                             continue;
                         }
                         children.add(baby);
-                        System.out.println("Move From: " + (tile - 1) + " -> " + (tile - 1 + target_position) + " Successfully Added to possible moves");
+                        // FOR DEBUG                               System.out.println("Move From: " + (tile - 1) + " -> " + (tile - 1 + target_position) + " Successfully Added to possible moves");
                     }
                 }
             }
         }
 
-        return doubleGetChildren(children, target_position, depth + 1);
+        return doubleGetChildren(children, target_position, depth + 1, validMoveCounter);
         
     }
 
@@ -495,7 +531,7 @@ public class Board
 
     int getLastPlayer()
     {
-        return this.lastPlayer;
+        return this.currPlayer;
     }
 
     int[] getGameBoard()
@@ -503,20 +539,27 @@ public class Board
         return this.gameBoard;
     }
 
-    void setGameBoard(int[] gameBoard)
-    {
-        //Work in progress
+    Dice getDice() {
+        return this.dice;
+    }
+
+    void setDice(Dice dice) {
+        this.dice = dice;
     }
 
     void setLastMove(Move lastMove)
     {
         this.lastMove.setStart(lastMove.getStart());
-        this.lastMove.setValue(lastMove.getScore());
+        this.lastMove.setScore(lastMove.getScore());
     }
 
-    void setLastPlayer(int lastPlayer)
+    void updateTurnScore(Turn turn) {
+        this.lastTurn.setScore(turn.getScore());
+    }
+
+    void setLastPlayer(int currPlayer)
     {
-        this.lastPlayer = lastPlayer;
+        this.currPlayer = currPlayer;
     }
 
     public boolean equals(Object e) { // Method contains() in ArrayList uses equals() to compare objects. Overrode this function in order for contains() to work.
