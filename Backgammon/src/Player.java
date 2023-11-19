@@ -5,7 +5,6 @@ public class Player
 {
     private int maxDepth;
     private int playerLetter;
-    //private ArrayList<Move> moves = new ArrayList<>();
 
     Player(int maxDepth, int playerLetter)
     {
@@ -22,7 +21,6 @@ public class Player
     }
 
     // The max and min functions are called one after another until a max depth is reached or we have a terminal board.
-    // We create a tree using backtracking DFS.
     Turn max(Board board, int depth, double alpha, double beta)
     {
         /* If MAX is called on a state that is terminal or after a maximum depth is reached,
@@ -37,6 +35,8 @@ public class Player
         {
             return new Turn(board.getLastTurn());
         }
+
+        // FOR DEBUG                               System.out.println("Entering MAX. Getting children from board with player " + board.getLastPlayer() + " then calling CHANCE. Depth: "
 
         children = board.getChildren(Board.W);
 
@@ -80,7 +80,7 @@ public class Player
             return new Turn(board.getLastTurn());
         }
 
-        // FOR DEBUG                               System.out.println("Entering MIN. Getting children from board with player " + board.getLastPlayer() + "then calling CHANCE. Depth: " + depth);
+        // FOR DEBUG                               System.out.println("Entering MIN. Getting children from board with player " + board.getLastPlayer() + " then calling CHANCE. Depth: " + depth);
 
         children = board.getChildren(Board.B);
 
@@ -116,20 +116,25 @@ public class Player
         Turn result;
         double totalScore = 0.0;
 
+        if(board.isTerminal() || (depth == this.maxDepth))
+        {
+            return new Turn(board.getLastTurn());
+        }
+
         for (int i = 1; i < 7; i++) {
             for (int j = i; j < 7; j++) {
                 Board temp = new Board(board);
                 temp.setDice(new Dice(i, j));
-                if (board.getLastPlayer() == Board.W) { // After a turn is calculated, the board switches the lastPlayer variable
+                if (board.getLastPlayer() == Board.W) { // After a turn is calculated, the board switches the lastPlayer variable. That means getLastPlayer() will fetch us the appropriate player (white for max, black for min).
                     result = max(temp, depth, alpha, beta);
                 } else {
                     result = min(temp, depth, alpha, beta);
                 }
-                totalScore += result.getScore() * temp.getDice().prob();
+                totalScore += result.getScore() * temp.getDice().prob(); // Expectiminimax is the sum of every "evaluation * probability" product
                 children.add(temp);
             }
         }
-        return new Turn(new Move(totalScore));
+        return new Turn(new Move(totalScore)); // This does not actually represent a move, just the node's score.
     }
 
 }

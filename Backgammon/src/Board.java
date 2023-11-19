@@ -377,13 +377,13 @@ public class Board
         for (int i = 2; i < 26; i++) {
             if (i <= 7) {
                 if (this.gameBoard[i] < 0) { // If we are in Black's home area, count all spaces as the first one
-                    scoreB += 18 * this.gameBoard[i];
+                    scoreB += 19 * this.gameBoard[i];
                 } else {
                     scoreW += (i - 1) * this.gameBoard[i];
                 }
             } else if (i >= 20) { // If we are in White's home area, count all spaces as the first one
                 if (this.gameBoard[i] > 0) {
-                    scoreW += 18 * this.gameBoard[i];
+                    scoreW += 19 * this.gameBoard[i];
                 } else {
                     scoreB += (26 - i) * this.gameBoard[i];
                 }
@@ -396,8 +396,8 @@ public class Board
             }
         }
         
-        scoreW += 18.5 * this.gameBoard[ESCAPE_W];
-        scoreB += 18.5 * this.gameBoard[ESCAPE_B];
+        scoreW += 19.5 * this.gameBoard[ESCAPE_W];
+        scoreB += 19.5 * this.gameBoard[ESCAPE_B];
 
 
 
